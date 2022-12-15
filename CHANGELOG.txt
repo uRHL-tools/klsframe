@@ -3,4 +3,8 @@ Change Log
 
 0.0.1 (15/12/2022)
 -------------------
-- Beta implementation
+- Beta release
+
+0.0.2 (16/12/2022)
+-------------------
+- Minor fixes in project's description and configuration

@@ -47,7 +47,6 @@ class APIworker:
             }
         ]
 
-
     def request(self, url, method='GET', params=None, headers=None, cookies=None):
         # TODO: develop enconde params and url
         # TODO: review authentication, files... and the rest of parameters
