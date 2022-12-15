@@ -4,44 +4,49 @@ build-backend = "hatchling.build"
 
 [project]
 name = "klsframe"
-version = "0.0.1"
 description = ''
 readme = "README.md"
 requires-python = ">=3.7"
 license = "MIT"
 keywords = []
 authors = [
-  { name = "Ramon Hernandez Leon", email = "rhdezl05@gmail.com" },
+    { name = "Ramon Hernandez Leon", email = "rhdezl05@gmail.com" },
 ]
 classifiers = [
-  'Development Status :: 5 - Production/Stable',
-  'Intended Audience :: Productivity',
-  'Operating System :: Windows :: Linux',
-  'License :: OSI Approved :: MIT License',
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Developers',
+    'Intended Audience :: End Users/Desktop',
+    'Operating System :: OS Independent',
+    'License :: OSI Approved :: MIT License',
+    'Natural Language :: English',
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    'Topic :: Scientific/Engineering',
+    'Topic :: Software Development :: Libraries :: Application Frameworks',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: System :: Shells',
+    'Topic :: Terminals',
+    'Topic :: Utilities'
 ]
-dependencies = []
+
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/klsframe#readme"
-Issues = "https://github.com/unknown/klsframe/issues"
-Source = "https://github.com/unknown/klsframe"
+Documentation = "https://github.com/uRHL-tools/klsframe#readme"
+Issues = "https://github.com/uRHL-tools/klsframe/issues"
+Source = "https://github.com/uRHL-tools/klsframe"
 
 [tool.hatch.version]
 path = "klsframe/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "pytest",
-  "pytest-cov",
+    "pytest",
+    "pytest-cov",
+    'pyautogui>=0.9.53',
+    'keyboard>=0.13.5',
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=klsframe --cov=tests {args}"
@@ -54,12 +59,12 @@ python = ["37", "38", "39", "310", "311"]
 branch = true
 parallel = true
 omit = [
-  "klsframe/__about__.py",
+    "klsframe/__about__.py",
 ]
 
 [tool.coverage.report]
 exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
+    "no cov",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
 ]
