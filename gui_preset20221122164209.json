@@ -1,0 +1,114 @@
+[
+  {
+    "view_assets": {
+      "name_col": [
+        305,
+        236
+      ],
+      "secondary_id_col": [
+        498,
+        234
+      ],
+      "ip_col": [
+        804,
+        234
+      ],
+      "numof_comp_col": [
+        1045,
+        234
+      ],
+      "numof_vulns_col": [
+        1145,
+        234
+      ],
+      "edit_button": [
+        1248,
+        234
+      ],
+      "next_page_button": [
+        1323,
+        547
+      ],
+      "search_bar": [
+        1190,
+        155
+      ],
+      "delete_button": [
+        1269,
+        234
+      ],
+      "confirm_deletion_button": [
+        763,
+        419
+      ]
+    }
+  },
+  {
+    "asset_components": {
+      "name_col": [
+        212,
+        234
+      ],
+      "cpe_col": [
+        763,
+        234
+      ],
+      "port_col": [
+        1034,
+        235
+      ]
+    }
+  },
+  {
+    "edit_asset": {
+      "name_field": [
+        400,
+        370
+      ],
+      "client_id_field": [
+        400,
+        194
+      ],
+      "secondary_id_field": [
+        400,
+        253
+      ],
+      "asset_type_field": [
+        930,
+        190
+      ],
+      "ip_field": [
+        930,
+        250
+      ],
+      "purpose_field": [
+        930,
+        310
+      ],
+      "description_field": [
+        930,
+        380
+      ],
+      "accept_button": [
+        1130,
+        650
+      ],
+      "cancel_button": [
+        1230,
+        650
+      ]
+    }
+  },
+  {
+    "component_details": {
+      "estado_col": [
+        577,
+        234
+      ],
+      "desc_col": [
+        984,
+        232
+      ]
+    }
+  }
+]
