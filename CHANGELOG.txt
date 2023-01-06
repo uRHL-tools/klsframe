@@ -8,3 +8,14 @@ Change Log
 0.0.2 (16/12/2022)
 -------------------
 - Minor fixes in project's description and configuration
+
+0.1 (06/01/2023)
+-------------------
+- Package reorganization. The code is now organized in submodules: cli, gui, utilities and workers
+- Added __init__.py file to the package and its submodules
+- Added new classes: WebWorker and statistics
+- Cli.safe_numeric_input implemented
+- New components added to the module guiLayout (GUIButton, GUIInput, GUITextbox, GUITable, GUIHyperlink, GUIImage)
+- The class cli.PromptForm has known bugs that will be fixed in the next patch
+- gui.guiLayout and workers.desktopWorker are being refactored due to circular dependencies
+- Minor fixes in project's description and documentation

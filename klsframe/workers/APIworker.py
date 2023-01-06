@@ -2,7 +2,7 @@ import requests
 
 
 class APIworker:
-    def __init__(self, methods, ):
+    def __init__(self, methods):
         __HTTP_METHODS__ = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
         if methods is None:
             methods = ['GET']
@@ -47,10 +47,11 @@ class APIworker:
             }
         ]
 
-    def request(self, url, method='GET', params=None, headers=None, cookies=None):
-        # TODO: develop enconde params and url
+    def request(self, url, method='GET', params=None, headers=None, cookies=None, verify=True):
+        # TODO: develop encode params and url
         # TODO: review authentication, files... and the rest of parameters
-        req_args = {'method': method, 'url': url, 'params': params, 'headers': headers, 'cookies': cookies}
+        req_args = {'method': method, 'url': url, 'params': params,
+                    'headers': headers, 'cookies': cookies, 'verify': verify}
         if method in self._allowed_methods:
             response = requests.request(**req_args)
         else:
@@ -60,3 +61,20 @@ class APIworker:
             return response
         else:
             raise requests.HTTPError(f'Unexpected status code ({response.status_code}) for the request {req_args}')
+
+    def scrap(self, url, depth=0):
+        from bs4 import BeautifulSoup
+
+        w = APIworker.APIworker('GET')
+
+        all_links = []
+        MAX_DEPTH = 3
+        if depth >= MAX_DEPTH:
+            raise AttributeError("[ERROR] Max depth exceeded")
+        res = w.request(url)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        # print(soup.prettify())
+        # do things. For example
+        for link in soup.find_all('a'):
+            href = link.get('href')[2:]
+            all_links.append(href)

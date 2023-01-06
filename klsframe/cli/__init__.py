@@ -13,7 +13,7 @@ list, set, and tuple.
 * UserString   wrapper around string objects for easier string subclassing
 
 '''
-"""
+
 __version__ = '0.0.3'
 __all__ = [
     'workers'
@@ -34,12 +34,12 @@ import cli as cli
 import gui as gui
 import utilities as utilities
 
-try:
-    from _collections import deque
-except ImportError:
-    pass
-else:
-    _collections_abc.MutableSequence.register(deque)
+# try:
+#     from _collections import deque
+# except ImportError:
+#     pass
+# else:
+#     _collections_abc.MutableSequence.register(deque)
 
-def ChainMap():
-"""
+# def ChainMap():
+#     pass

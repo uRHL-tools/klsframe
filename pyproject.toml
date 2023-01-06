@@ -47,6 +47,7 @@ dependencies = [
     "pytest-cov",
     'pyautogui>=0.9.53',
     'keyboard>=0.13.5',
+    'beautifulsoup4>=4.11.1'
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=klsframe --cov=tests {args}"
