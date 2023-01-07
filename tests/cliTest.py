@@ -14,16 +14,16 @@ def test_prompt_form_simple():
 
 def test_prompt_form_advanced():
     form = cli.PromptForm(title='Test 2', desc='Just a test. Or not. I don\'t care')
-    form.add_field(name='Nombre', description='Nombre del titular de la cuenta', example='Pedro')
-    form.add_field(name='Apellidos', description='Apellidos del titular de la cuenta', example='Pérez')
-    form.add_field(name='Edad', description='Edad en años del titular de la cuenta', example='12', ftype='number',
-                   regex='[0-9]{1,3}')
-    form.add_field('hobbies', ftype='list')
+    form.add_string_field(name='Nombre', description='Nombre del titular de la cuenta', example='Pedro')
+    form.add_string_field(name='Apellidos', description='Apellidos del titular de la cuenta', example='Pérez')
+    form.add_numeric_field(name='Edad', description='Edad en años del titular de la cuenta', example='12',
+                           decimal_digits=0, min_val=1, max_val=99)
+    form.add_list_field(name='hobbies', description="Top-3 hobbies", max_size=3)
+    form.add_list_field(name='fav num', description='Top-3 Favorite numbers', ltype='number', allow_repeated=False, fixed_size=3)
     # form.show_info()
-    res = form.fill_in(compact_mode=False, confirm=True)
+    res = form.fill_in(compact_mode=True, confirm=True)
     print(res)
     assert res == form.last_result
-    assert 'Nombre' in res and 'Apellidos' in res and 'Edad' in res
     print('[OK] Test prompt_form_advanced_test succeeded\n\n')
 
 
@@ -35,7 +35,7 @@ def test_confirm():
 
 def test_safe_input():
     age1 = input("Age")
-    age2 = cli.safe_input("Age", )
+    age2 = cli.safe_string_input("Age", )
 
 
 def test_menu1():
@@ -75,11 +75,16 @@ def test_menu3():
         prompt = f"Introduce tu propia seleccion de puertos, separados por espacio (23 80 443) o un rango (0-1024)"
         range_regex = '^[0-9]{1,5}-[0-9]{1,5}$'
         listing_regex = '^(([0-9]{1,5})+[ ]?)+$'
-        return cli.safe_input(validations=[range_regex, listing_regex], allow_empty=False, prompt=prompt)
+        return cli.safe_string_input(validations=[range_regex, listing_regex], allow_empty=False, prompt=prompt)
 
     menu2 = cli.Menu(allowcustom=True, customprompt=input_port)
     menu2.add_entries(menu_options1)
     print(menu2.open())
+
+
+def test_safe_list_input_1():
+    print(cli.safe_list_input(sep='new-line', max_size=5, fixed_size=3, ltype='number', allow_repeated=False,
+                              prompt='Dime 3 numeros del 1 al 10', min_val=1, max_val=10))
 
 
 if __name__ == '__main__':

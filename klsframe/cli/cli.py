@@ -1,7 +1,5 @@
 import re
 from typing import Union
-
-import klsframe.gui.gui as klsgui
 from klsframe.utilities.utils import validate, text_padding, dict_to_table
 
 
@@ -34,7 +32,7 @@ def confirm_yes_no(selection, default=True, allow_empty=True, shortened=True):
             print(f"Option '{opt}' not recognized")
 
 
-def safe_input(validations=None, prompt=None, error_msg=None, confirm=False, allow_empty=True):
+def safe_string_input(validations=None, prompt=None, error_msg=None, confirm=False, allow_empty=True):
     """
     Safe input for string values. Reads input from terminal, performing some security checks on the input
 
@@ -51,9 +49,9 @@ def safe_input(validations=None, prompt=None, error_msg=None, confirm=False, all
     if error_msg is None:
         error_msg = "Error. Invalid input"
     if prompt is None:
-        prompt = "Please introduce a value"
+        prompt = "Please introduce a value:"
     while True:
-        inval = input(f"{prompt}:\t")
+        inval = input(f"{prompt}\t")
         if not allow_empty and inval == "":
             print(f"{error_msg} (Input cannot be empty)")
         elif validate(inval, validations):
@@ -65,18 +63,14 @@ def safe_input(validations=None, prompt=None, error_msg=None, confirm=False, all
             print(f"{error_msg} (Validation failed)")
 
 
-def safe_string_input():
-    # TODO: safe_string_input(). Actually it is already implemented in safe_input()
-    # Just apply regex
-    pass
-
-
-def safe_number_input(min_val=None, max_val=None, decimal_digits=0, decimal_sep='.', default=None) -> Union[int, float]:
+def safe_number_input(min_val=None, max_val=None, prompt=None,
+                      decimal_digits=None, decimal_sep='.', default=None, **kwargs) -> Union[int, float]:
     """
     Safe input for numeric values.
 
     :param min_val: Min value allowed. None (-infinite) by default
     :param max_val: Max value allowed. None (infinite) by default
+    :param prompt: Custom message for the input prompt
     :param decimal_digits: Decimal digit count. 0 (default) for integer numbers.
         If not None, the input is rounded to ``decimal_digits``
     :param decimal_sep: Character used to separate the decimal part from the integer part.
@@ -91,27 +85,46 @@ def safe_number_input(min_val=None, max_val=None, decimal_digits=0, decimal_sep=
         thousand_sep = '.'
     else:
         raise ValueError("Unexpected value for parameter 'decimal_sep'. Allowed: ,|.")
+    if decimal_digits is not None and not isinstance(decimal_digits, int):
+        raise TypeError("Unexpected type for parameter 'decimal_digits'. Allowed: int")
     bounds = f"[{min_val}, {max_val}]".replace('[None', '(-infinite').replace('None]', 'infinite)')
     # General number regex
     custom_regex = "^-?([0-9]{1,3}" + thousand_sep + ")*[0-9]+"
-    if decimal_digits > 0:
+    if decimal_digits is None:
+        _prompt = f'Please introduce a number within {bounds}'
+        custom_regex += "(\\" + decimal_sep + "[0-9]+)?"
+    elif decimal_digits > 0:
         custom_regex += "(\\" + decimal_sep + "[0-9]+)?"
         _prompt = f'Please introduce an decimal number (up to {decimal_digits} decimal digits) within {bounds}'
     else:
         _prompt = f'Please introduce an integer number within {bounds}'
+    if prompt is not None:
+        _prompt = prompt
     # Check parameter `default`
-    if default is None:
-        _allow_empty = False
+    if 'allow_empty' in kwargs and kwargs['allow_empty'] and isinstance(kwargs['allow_empty'], bool):
+        _allow_empty = kwargs['allow_empty']
+        if _allow_empty:
+            custom_regex = f"({custom_regex})?"  # Include the empty input in the regex
     else:
-        _allow_empty = True
-        custom_regex = f"({custom_regex})?"  # Include the empty input in the regex
+        _allow_empty = False
+    if default is not None:
         _prompt += f" [default: {default}]"  # Inform the user about the default value
     # Questioning loop
     while True:
-        inval = safe_input(prompt=_prompt, validations=custom_regex, allow_empty=_allow_empty).replace(thousand_sep, '')
-        if inval == '':  # If user input is empty, use the default value
-            inval = default
-        if decimal_digits > 0:
+        inval = safe_string_input(prompt=_prompt, validations=custom_regex,
+                                  error_msg="Error. Not a number, or expecting an integer but received a float",
+                                  allow_empty=_allow_empty).replace(thousand_sep, '')
+        if inval == '' and _allow_empty:  # If user input is empty, use the default value
+            return default
+        elif decimal_digits is None:
+            try:
+                if inval.find(decimal_sep) != -1:
+                    inval = float(inval)
+                else:
+                    inval = int(inval)
+            except ValueError:
+                print(f"[ERROR] Unexpected numeric value ({inval})")
+        elif decimal_digits > 0:
             inval = float(inval).__round__(decimal_digits)
         else:
             inval = int(inval)
@@ -120,6 +133,111 @@ def safe_number_input(min_val=None, max_val=None, decimal_digits=0, decimal_sep=
         else:
             print(f"[ERROR] Value out of bounds {bounds}")
 
+
+def safe_list_input(max_size=-1, fixed_size=-1, sep=",", ltype="string", allow_repeated=True, validations=None,
+                    prompt=None, confirm=False, allow_empty=True, **kwargs):
+    """
+    TODO: selectable list using the arrows
+    :param max_size:
+    :param fixed_size:
+    :param sep:
+    :param ltype:
+    :param allow_repeated:
+    :param validations:
+    :param prompt:
+    :param confirm:
+    :param allow_empty:
+    :param kwargs:
+    :return:
+    """
+    _allowed_types = ['string', 'number']
+    if fixed_size is not None and fixed_size > 0:
+        print(f"[WARN] 'fixed_size' = {fixed_size} != {max_size} = 'max_size'."
+              f" Overwriting 'max_size' value with 'fixed_size")
+        max_size = fixed_size
+    if prompt is None:
+        pre_prompt = ''
+    else:
+        pre_prompt = f"{prompt}\n"
+    while True:
+        user_input = []
+        if sep == 'new-line':
+            # read each item in a new line
+            # empty input to finish or max size reached
+            # prompt = (i-th) value
+            print(f"{pre_prompt}Press enter to add a value. Empty input to finish")
+            counter = 1
+            while True:
+                if ltype == 'string':
+                    inval = safe_string_input(
+                        validations=validations,
+                        prompt=f"({counter})"
+                    )
+                elif ltype == 'number':
+                    inval = safe_number_input(
+                        prompt=f"({counter})",
+                        allow_empty=True,
+                        **kwargs
+                    )
+                else:
+                    raise ValueError("Unexpected value for parameter 'ltype'. Allowed: string|number")
+                if inval is None or inval == '':
+                    if fixed_size == -1 or len(user_input) == fixed_size:
+                        break
+                    else:
+                        print(f"Required values: {fixed_size}. Missing: {fixed_size - len(user_input)}")
+                        continue
+                else:
+                    if bool(allow_repeated) or inval not in user_input:
+                        user_input.append(inval)
+                        counter += 1
+                    else:
+                        print(f"[ERROR] Duplicates not allowed ({inval})")
+
+                if max_size != -1 and len(user_input) >= max_size:
+                    break
+        else:
+            # Single line input using sep
+            # Read up to ``size`` items
+            inval = safe_string_input(
+                validations=validations,
+                prompt=f"{pre_prompt}Enter the values separated by '{sep}':"
+            )
+            if max_size is not None and max_size > 0:
+                _limit = max_size
+            else:
+                _limit = len(inval)
+            if ltype == 'number':
+                for num in [item.strip() for item in inval.split(sep)[0:_limit]]:
+                    try:
+                        if num.find('.') != -1:
+                            user_input.append(float(num))
+                        else:
+                            user_input.append(int(num))
+                    except ValueError:
+                        print(f"[WARN] Invalid value found in the input list ({num})")
+            elif ltype == 'string':
+                if inval != '':
+                    user_input.extend([item.strip() for item in inval.split(sep)[0:_limit]])
+            else:
+                raise ValueError("Unexpected value for parameter 'ltype'. Allowed: number|string")
+            if not allow_repeated:
+                user_input = list(set(user_input))
+        if not allow_empty and len(user_input) == 0:
+            print("Error. The list cannot be empty")
+            continue
+        elif fixed_size is not None and 0 < fixed_size != len(user_input):
+            print(f"Error. Required values: {fixed_size}. Missing: {fixed_size - len(user_input)}")
+            continue
+        elif not confirm or (confirm and confirm_yes_no(user_input)):
+            break
+    return user_input
+
+
+# def safe_number_list_input(size=-1, sep=",", min_val=0, max_val=0, decimal_digits=2, default=0, prompt=f"()",
+#                            confirm=False):
+#     # TODO: Differentiate between safe_number_list_input() and safe_string_list_input()?
+#     pass
 
 def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_custom=False, verbose=False):
     # I disabled the param allow_empty because if a custom opt is offered, the empty option should not be available,
@@ -185,7 +303,7 @@ def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_cus
                     # Counter = -1 => clarify that the (custom) option is not included in the list provided by the user
                     counter = -1
                     if custom_prompt is None:
-                        value = safe_input(allow_empty=False)
+                        value = safe_string_input(allow_empty=False)
                     else:
                         value = custom_prompt()
                 else:  # Any other option selected
@@ -267,22 +385,23 @@ class Menu:
 # --------------------<| F O R M S |>---------------------------------------
 # --------------------------------------------------------------------------
 
-class FormField:
-    def __init__(self, name, description='', example='', ftype='string', regex=None, nullable=False, defaultval=None):
-        self.name = str(name)
-        self.description = str(description)
-        self.example = str(example)
-        _allowed_types = ['string', 'number', 'list']
-        if ftype in _allowed_types:
-            self.ftype = str(ftype)
-        else:
+class StringField:
+    def __init__(self, name: str, description='', example='', ftype='string', regex=None, allow_empty=True,
+                 confirm=False, defaultval=None):
+        _allowed_types = ['string', 'numeric', 'list']
+        if ftype not in _allowed_types:
             raise ValueError(f"Invalid value for FormField.ftype. Allowed values are: {', '.join(_allowed_types)}")
-        self.regex = regex
-        if isinstance(nullable, bool):
-            self.is_nullable = bool(nullable)
-        else:
+        elif not isinstance(allow_empty, bool):
             raise TypeError("Invalid value for FormField.is_nullable. Only bool allowed")
-        self.default_value = defaultval
+        else:
+            self.ftype = str(ftype)
+            self.name = str(name)
+            self.description = str(description)
+            self.example = str(example)
+            self.confirm = bool(confirm)
+            self.regex = regex
+            self.allow_empty = bool(allow_empty)
+            self.default_value = defaultval
 
     def __repr__(self):
         return self.__str__()
@@ -309,13 +428,11 @@ class FormField:
 
     def input(self):
         # while True:
-        # TODO: use safe input to simplify the method and avoid code repetition
-        return safe_input(
+        return safe_string_input(
             validations=self.regex,
             prompt=f'>> {self.name} = ',
-            error_msg=None,
-            confirm=False,
-            allow_empty=self.is_nullable
+            confirm=self.confirm,
+            allow_empty=self.allow_empty
         )
         # inval = input(f'>> {self.name} = ')
         # if inval == '' and not self.is_nullable:
@@ -328,35 +445,23 @@ class FormField:
         # return inval
 
 
-class StringFormField(FormField):
-    def __init__(self, name, description='', example='', regex=None, nullable=False, defaultval=''):
-        super().__init__(name=name, description=description, example=example, ftype='string', regex=regex,
-                         nullable=nullable, defaultval=defaultval)
-
-    def input(self):
-        return str(super().input())
-
-
-class NumberFormField(FormField):
-    def __init__(self, name, description='', example='', regex=None, nullable=False, defaultval=0.0, decimal_digits=0,
-                 decimal_separator='.', min_val=None, max_val=None):
-        super().__init__(name=name, description=description, example=example, ftype='string', regex=regex,
-                         nullable=nullable, defaultval=defaultval)
-        self.decimal_digits = decimal_digits
+class NumericField(StringField):
+    def __init__(self, name, decimal_digits=None, decimal_separator='.', min_val=None, max_val=None, **kwargs):
+        _allowed_separators = [',', '.']
         if min_val > max_val:
             raise ArithmeticError("Parameter 'min_val' is greater than 'max_val'")
+        elif decimal_separator not in _allowed_separators:
+            raise ValueError("Unexpected value for the parameter 'decimal_separator'. Allowed: ',' | '.'")
         else:
+            super().__init__(name=name, ftype='numeric', **kwargs)
             self.min_val = min_val
             self.max_val = max_val
-        _allowed_separators = [',', '.']
-        if decimal_separator in _allowed_separators:
+            self.decimal_digits = decimal_digits
             self.decimal_separator = decimal_separator
-        else:
-            raise ValueError("Unexpected value for the parameter 'decimal_separator'. Allowed: ',' | '.'")
 
     @property
-    def regex(self):
-        # Build regex from min_val, max_val, decimal_digits and decimal_separator
+    def get_regex(self):
+        # TODO: Build regex from min_val, max_val, decimal_digits and decimal_separator
         custom_regex = "^"
         if self.min_val < 0 or self.max_val < 0:
             custom_regex += "-?"
@@ -370,30 +475,51 @@ class NumberFormField(FormField):
         return custom_regex
 
     def input(self):
-        inval = safe_input(
-            validations=self.regex,
+        return safe_number_input(
+            min_val=self.min_val,
+            max_val=self.max_val,
+            decimal_digits=self.decimal_digits,
+            decimal_sep=self.decimal_separator,
+            default=self.default_value,
             prompt=f'>> {self.name} = ',
-            error_msg="Error. Invalid input. Allowed: []",
-            confirm=False,
-            allow_empty=self.is_nullable
+            confirm=self.confirm,
+            allow_empty=self.allow_empty
         )
-        if self.decimal_digits > 0:
-            inval = float(inval)
-        else:
-            inval = int(inval)
-        if self.min_val <= inval <= self.max_val:
-            return inval
-        else:
-            raise ValueError(f"Value out of range. Allowed: [{self.min_val}, {self.max_val}]")
+        # if self.decimal_digits > 0:
+        #     inval = float(inval)
+        # else:
+        #     inval = int(inval)
+        # if self.min_val <= inval <= self.max_val:
+        #     return inval
+        # else:
+        #     raise ValueError(f"Value out of range. Allowed: [{self.min_val}, {self.max_val}]")
 
 
-class ListFormField(FormField):
-    def __init__(self, name, description='', example='', regex=None, nullable=False, defaultval='', elem_separator=',',
-                 max_len=None):
-        super().__init__(name=name, description=description, example=example, ftype='string', regex=regex,
-                         nullable=nullable, defaultval=defaultval)
-        self.elem_separator = elem_separator
-        self.max_len = max_len
+class ListField(StringField):
+    def __init__(self, name, sep=',', max_size=-1, fixed_size=-1, ltype="string", allow_repeated=True, **kwargs):
+        if ltype in ['string', 'number']:
+            super().__init__(name=name, ftype='list', **kwargs)
+            self.ltype = ltype
+            self.sep = sep
+            self.max_size = max_size
+            self.fixed_size = fixed_size
+            self.allow_repeated = bool(allow_repeated)
+            self.properties = kwargs
+        else:
+            raise ValueError("Unexpected value for parameter 'ltype'. Allowed: string|number")
+
+    def input(self):
+        return safe_list_input(
+            max_size=self.max_size,
+            fixed_size=self.fixed_size,
+            sep=self.sep,
+            ltype=self.ltype,
+            allow_repeated=self.allow_repeated,
+            validations=self.regex,
+            confirm=self.confirm,
+            allow_empty=self.allow_empty,
+            **self.properties
+        )
 
 
 class PromptForm:
@@ -422,59 +548,22 @@ class PromptForm:
     def get_summary_table(self):
         return f"\n----< Form '{self.title}' >----\n{dict_to_table(self.last_result)}"
 
-    def add_field(self, name, description='', example='', ftype='string', regex=None, nullable=False, defaultval=''):
-        _allowed_types = ['string', 'number', 'list']
-        if ftype not in _allowed_types:
-            raise ValueError(f"Unexpected value for paramter 'ftype'. Allowed: {', '.join(_allowed_types)}")
-        if ftype == 'string':
-            self.add_string_field(name=name, description=description, example=example, regex=regex,
-                                  nullable=nullable, defaultval=defaultval)
-        elif ftype == 'number':
-            self.add_numeric_field()
-        elif ftype == 'list':
-            self.add_list_field()
-        # self.fields.append(FormField(name=name, description=description, example=example, ftype=ftype, regex=regex,
-        #                              nullable=nullable, defaultval=defaultval))
+    def add_string_field(self, name, **kwargs):
+        self.fields.append(StringField(name=name, **kwargs))
 
-    def add_string_field(self, name, description='', example='', regex=None, nullable=False, defaultval=''):
-        self.fields.append(StringFormField(name=name, description=description, example=example, regex=regex,
-                                           nullable=nullable, defaultval=defaultval))
+    def add_numeric_field(self, name, **kwargs):
+        self.fields.append(NumericField(name=name, **kwargs))
 
-    def add_numeric_field(self, name, description='', example='', regex=None,
-                          nullable=False, defaultval=0, decimal_digits=2, decimal_separator='.'):
-        self.fields.append(NumberFormField(name=name, description=description, example=example, regex=regex,
-                                           nullable=nullable, defaultval=defaultval, decimal_digits=decimal_digits,
-                                           decimal_separator=decimal_separator))
-
-    def add_list_field(self, name, description='', example='', regex=None,
-                       nullable=False, defaultval='', separator=',', max_len=None):
-        """
-
-        :param name: Name of the form field
-        :param description: Description of the form field
-        :param example: Example of a valid value for the field
-        :param regex: Regex to be matched against the user input
-        :param nullable: Enables/disables a null/None/empty input
-        :param defaultval: Default value for a list element
-        :param separator: character used to separate the elements of the list. The comma (, ) is used by default
-        :param max_len: maximum length of the list. None for no size restriction
-        :return: A python list containing the input values
-        """
-        self.fields.append(ListFormField(name=name, description=description, example=example, regex=regex,
-                                         nullable=nullable, defaultval=defaultval, elem_separator=separator,
-                                         max_len=max_len))
+    def add_list_field(self, name, **kwargs):
+        self.fields.append(ListField(name=name, **kwargs))
 
     def reset(self):
         self.last_result.clear()
 
-    def fill_in(self, compact_mode=True, confirm=False, gui=False):
+    def fill_in(self, compact_mode=True, confirm=False):
         while True:
             input_form = {}
-            if gui:
-                klsgui.confirm_continue_or_exit(title=f"Form '{self.title}'", text=self.description,
-                                                button_continue='Start')
-            else:
-                print(f"---< Form '{self.title}' >---")
+            print(f"---< Form '{self.title}' >---")
             if not compact_mode:
                 print(f"{self.description}\n{'-' * 20}")
             field_num = 0
@@ -482,46 +571,29 @@ class PromptForm:
                 if field_num >= len(self.fields):
                     break
                 field = self.fields[field_num]
-                if isinstance(field, FormField):
+                if isinstance(field, StringField):
                     # Print field information
+                    prompt = f"[Field {field_num + 1}/{len(self.fields)}]"
                     if compact_mode:
-                        print(f"[Field {field_num + 1}/{len(self.fields)}] {field}")
+                        prompt += f" {field}"
                     else:
-                        print(f"[Field {field_num + 1}/{len(self.fields)}]\n{field.long_str()}")
-                    # Desde aqui
-                    # input_form[field.name] = field.input()
-                    inval = input(f'>> {field.name} = ')
-                    if inval == '' and not field.is_nullable:
-                        print(f'[ERROR] This field cannot be empty')
-                        continue
-                    # Check field syntax
-                    if field.regex is None:
-                        pass
-                    elif re.fullmatch(field.regex, inval) is None:
-                        print(f'[ERROR] Invalid input syntax')
-                    # Check field type
-                    if field.ftype == 'string':
-                        input_form[field.name] = inval
-                    elif field.ftype == 'number':
-                        if inval.find('.') != -1:
-                            input_form[field.name] = float(inval)
-                        else:
-                            input_form[field.name] = int(inval)
-                    elif field.ftype == 'list':
-                        input_form[field.name] = [val.strip() for val in inval.split(',')]
-                    # hasta aqui
+                        prompt += f"\n{field.long_str()}"
+                    print(prompt)
+                    input_form[field.name] = field.input()
                     field_num += 1
                 else:
-                    raise TypeError("Invalid field type. Only cli.FormField allowed")
+                    raise TypeError("Invalid field type. Only cli.StringField allowed")
             self.last_result.update(input_form)
-            if confirm:
-                if confirm_yes_no(self.get_summary_table()):
-                    break
-                else:
-                    continue
-            else:
+            if not confirm or (confirm and confirm_yes_no(self.get_summary_table())):
                 break
+            else:
+                continue
         return input_form
+
+    def export(self):
+        # TODO: cli.PromptForm.export()
+        # Exports the lasts results into a txt or json file
+        pass
 
 
 # --------------------------------------------------------------------------
@@ -532,6 +604,3 @@ class PromptForm:
 if __name__ == '__main__':
     # Do some quick tests here
     pass
-
-
-

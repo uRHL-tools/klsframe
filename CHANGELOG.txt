@@ -19,3 +19,8 @@ Change Log
 - The class cli.PromptForm has known bugs that will be fixed in the next patch
 - gui.guiLayout and workers.desktopWorker are being refactored due to circular dependencies
 - Minor fixes in project's description and documentation
+
+0.1.1 (07/01/2023)
+-------------------
+- cli.safe_list_input implemented
+- Fixed bugs in the component cli.PromptForm
