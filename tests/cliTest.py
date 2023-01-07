@@ -19,7 +19,8 @@ def test_prompt_form_advanced():
     form.add_numeric_field(name='Edad', description='Edad en años del titular de la cuenta', example='12',
                            decimal_digits=0, min_val=1, max_val=99)
     form.add_list_field(name='hobbies', description="Top-3 hobbies", max_size=3)
-    form.add_list_field(name='fav num', description='Top-3 Favorite numbers', ltype='number', allow_repeated=False, fixed_size=3)
+    form.add_list_field(name='fav num', description='Top-3 Favorite numbers', ltype='number', allow_repeated=False,
+                        fixed_size=3)
     # form.show_info()
     res = form.fill_in(compact_mode=True, confirm=True)
     print(res)
@@ -38,7 +39,7 @@ def test_safe_input():
     age2 = cli.safe_string_input("Age", )
 
 
-def test_menu1():
+def test_menu_1():
     def cagar():
         print('prffrfffrf')
 
@@ -55,7 +56,7 @@ def test_menu1():
     print(men.open())
 
 
-def test_menu2():
+def test_menu_2():
     dict_port_listing = {"Por defecto (no se especifican puertos)": "",
                          "Todos los puertos": "-p-",
                          "1000 puertos comunes": "--top-ports 1000"}
@@ -64,7 +65,7 @@ def test_menu2():
     print(menu1.open())
 
 
-def test_menu3():
+def test_menu_3():
     menu_options1 = [
         {'value': '', 'description': 'Por defecto (no se especifican puertos)'},
         {'value': '-p-', 'description': 'Todos los puertos'},
@@ -82,6 +83,13 @@ def test_menu3():
     print(menu2.open())
 
 
+def test_menu_4():
+    dict_port_listing = ["Por defecto (no se especifican puertos)", "Todos los puertos", "1000 puertos comunes"]
+    menu1 = cli.Menu(allowcustom=False)
+    menu1.add_entries(dict_port_listing)
+    print(menu1.open())
+
+
 def test_safe_list_input_1():
     print(cli.safe_list_input(sep='new-line', max_size=5, fixed_size=3, ltype='number', allow_repeated=False,
                               prompt='Dime 3 numeros del 1 al 10', min_val=1, max_val=10))
@@ -90,6 +98,7 @@ def test_safe_list_input_1():
 if __name__ == '__main__':
     # test_confirm()
     # test_prompt_form_simple()
-    test_prompt_form_advanced()
+    # test_prompt_form_advanced()
     # test_dict_to_table()
     # pyautogui.prompt(text="Apellido", title="field 1/3", default="mondongo")
+    print(test_menu_4())

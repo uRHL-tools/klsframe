@@ -362,6 +362,10 @@ class Menu:
                 self.add_entry(v, k)
         elif isinstance(iterable, list):
             for elem in iterable:
+                if 'value' in elem:
+                    val = elem['value']
+                else:
+                    val = elem
                 if 'description' in elem:
                     desc = elem['description']
                 else:
@@ -370,7 +374,7 @@ class Menu:
                     cb = elem['callback']
                 else:
                     cb = None
-                self.add_entry(elem['value'], description=desc, callback=cb)
+                self.add_entry(val, description=desc, callback=cb)
         else:
             raise TypeError("Unexpected type for parameter 'iterable'. Allowed: dict | list")
 

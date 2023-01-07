@@ -24,3 +24,7 @@ Change Log
 -------------------
 - cli.safe_list_input implemented
 - Fixed bugs in the component cli.PromptForm
+
+0.1.2 (07/01/2023)
+-------------------
+- Bug fixed in the component cli.Menu.add_entries() that did not allowed to pass a plain string list as a parameter
