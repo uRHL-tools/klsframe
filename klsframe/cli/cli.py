@@ -362,15 +362,15 @@ class Menu:
                 self.add_entry(v, k)
         elif isinstance(iterable, list):
             for elem in iterable:
-                if 'value' in elem:
+                if isinstance(elem, dict) and 'value' in elem:
                     val = elem['value']
                 else:
                     val = elem
-                if 'description' in elem:
+                if isinstance(elem, dict) and 'description' in elem:
                     desc = elem['description']
                 else:
                     desc = None
-                if 'callback' in elem:
+                if isinstance(elem, dict) and 'callback' in elem:
                     cb = elem['callback']
                 else:
                     cb = None
