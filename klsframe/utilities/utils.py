@@ -96,6 +96,62 @@ def join_by(join_char, iterable):
     return str(join_char).join([str(val) for val in iterable])
 
 
+def get_df_rows(df, rindex=None):
+    """
+    Get the specified rows of a Pandas data frame
+    :param df: Pandas dataframe to be scrapped
+    :param rindex: Index of the rows to retrieve. It accepts strings and integer numbers. Accepted:
+        - None (default): all the rows are retrieved
+        - 1: single number, single index
+        - 1-4: indexes from 1 to 4, included
+        - 2,3,4: indexes 2,3,4
+        - 2,3,7-9: combination of the two previous modes
+        - head-N: first N rows
+        - tail-N: last N rows
+        - first: acronym for head-1
+        - last: acronym for tail-1
+    :return: a list containing one dict per each row (the dict's keys are the column names, its values the row values)
+    """
+    data = []
+    if rindex is None:
+        data = []
+        for index, row in df.iterrows():
+            data.append({k: v for k, v in row.items()})
+    elif isinstance(rindex, int):
+        data = []
+        for index, row in df.iterrows():
+            if index == rindex:
+                # data.append({k: v for k, v in row.items()})
+                return {k: v for k, v in row.items()}
+    else:
+        rindex = str(rindex)
+        if rindex == 'first':
+            return get_df_rows(df, df.first_valid_index())
+        elif rindex == 'last':
+            return get_df_rows(df, df.last_valid_index())
+        elif re.fullmatch('head-[0-9]+', rindex):
+            rindex = range(df.first_valid_index(), int(rindex.split('-')[1]))
+        elif re.fullmatch('tail-[0-9]+', rindex):
+            rindex = range(df.last_valid_index() + 1 - int(rindex.split('-')[1]), df.last_valid_index() + 1)
+        elif re.fullmatch('[0-9]+-[0-9]+', rindex):
+            rindex = range(int(rindex.split('-')[0]), int(rindex.split('-')[1]) + 1)
+        elif re.fullmatch('([0-9](-[0-9]+)?,)*[0-9]+(-[0-9]+)?', rindex):
+            # rindex = [int(i) for i in rindex.split(',')]
+            aux = []
+            for i in rindex.split(','):
+                try:
+                    aux.append(int(i))
+                except ValueError:
+                    aux.extend(range(int(i.split('-')[0]), int(i.split('-')[1]) + 1))
+            rindex = aux
+        else:
+            raise ValueError("Unexpected value for parameter 'rindex'")
+
+        for index, row in df.iterrows():
+            if index in rindex:
+                data.append({k: v for k, v in row.items()})
+    return data
+
 if __name__ == '__main__':
     # Do some quick tests here
     pass
