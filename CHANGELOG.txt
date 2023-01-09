@@ -40,3 +40,8 @@ Change Log
 0.2.1 (09/01/2022)
 -------------------
 - New fields in class cli.Menu: title and description. They provide some contextual info about the menu
+
+0.2.2 (09/01/2022)
+-------------------
+- Fixed a bug in the component cli.Menu.__init__() that forced all MenuEntries.values to be strings instead of objects
+

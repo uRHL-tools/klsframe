@@ -152,6 +152,7 @@ def get_df_rows(df, rindex=None):
                 data.append({k: v for k, v in row.items()})
     return data
 
+
 if __name__ == '__main__':
     # Do some quick tests here
     pass

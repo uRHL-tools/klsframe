@@ -289,6 +289,7 @@ def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_cus
     if enable_custom:
         counter += 1
         printable_prompt.insert(-1, f'{indent}{counter}. Custom value')
+        printable_prompt.insert(-1, f'{indent}{counter}. Custom value')
     while True:
         try:
             print("\n".join(printable_prompt))
@@ -324,7 +325,7 @@ def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_cus
 # --------------------------------------------------------------------------
 class MenuEntry:
     def __init__(self, val, desc=None, callback=None):
-        self.value = str(val)
+        self.value = val
         if desc is not None:
             self.description = str(desc)
         else:
@@ -333,9 +334,9 @@ class MenuEntry:
 
     def __str__(self):
         if self.description is not None and self.description != self.value:
-            return f"'{self.value}' ({self.description})"
+            return f"'{str(self.value)}' ({self.description})"
         else:
-            return f"'{self.value}'"
+            return f"'{str(self.value)}'"
 
     def __repr__(self):
         return str(self.value)
