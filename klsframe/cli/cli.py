@@ -342,7 +342,15 @@ class MenuEntry:
 
 
 class Menu:
-    def __init__(self, allowcustom=False, customprompt=None):
+    def __init__(self, title=None, desc=None, allowcustom=False, customprompt=None):
+        if title is None:
+            self.title = 'Untitled menu'
+        else:
+            self.title = f"{title} menu"
+        if desc is None:
+            self.description = 'no description provided'
+        else:
+            self.description = str(desc)
         self.entries = []
         self.allow_custom = allowcustom
         self.custom_prompt = customprompt
@@ -378,7 +386,9 @@ class Menu:
         else:
             raise TypeError("Unexpected type for parameter 'iterable'. Allowed: dict | list")
 
-    def open(self):
+    def open(self, verbose=False):
+        if verbose:
+            print(f"{self.title} - {self.description}")
         ret = selectable_list(self.entries, enable_custom=self.allow_custom, custom_prompt=self.custom_prompt)
         if isinstance(ret['value'], MenuEntry) and ret['value'].callback is not None:
             ret['value'].callback()

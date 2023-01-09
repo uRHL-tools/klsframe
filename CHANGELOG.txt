@@ -36,3 +36,7 @@ Change Log
 0.2 (09/01/2023)
 -------------------
 - Added utils.get_df_rows(). It retrieves a list of rows from a Pandas dataframe given their indexes
+
+0.2.1 (09/01/2022)
+-------------------
+- New fields in class cli.Menu: title and description. They provide some contextual info about the menu

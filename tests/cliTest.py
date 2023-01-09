@@ -85,9 +85,9 @@ def test_menu_3():
 
 def test_menu_4():
     dict_port_listing = ["Por defecto (no se especifican puertos)", "Todos los puertos", "1000 puertos comunes"]
-    menu1 = cli.Menu(allowcustom=False)
+    menu1 = cli.Menu(title='Test 4', desc='Just a dummy test. [Implicit options: (-T3, -vvv)]', allowcustom=False)
     menu1.add_entries(dict_port_listing)
-    print(menu1.open())
+    print(menu1.open(verbose=True))
 
 
 def test_safe_list_input_1():
