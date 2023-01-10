@@ -84,9 +84,17 @@ def test_menu_3():
 
 
 def test_menu_4():
-    dict_port_listing = ["Por defecto (no se especifican puertos)", "Todos los puertos", "1000 puertos comunes"]
-    menu1 = cli.Menu(title='Test 4', desc='Just a dummy test. [Implicit options: (-T3, -vvv)]', allowcustom=False)
-    menu1.add_entries(dict_port_listing)
+    data = ["Por defecto (no se especifican puertos)", "Todos los puertos", "1000 puertos comunes"]
+    menu1 = cli.Menu(title='Test 4', desc='Just a dummy test. [Implicit options: (-T3, -vvv)]', allowcustom=True)
+    menu1.add_entries(data)
+    print(menu1.open(verbose=True))
+
+
+def test_menu_5():
+    data = [{'tipo': 'tcp', 'desc': 'TCP SYN scan top ports', 'params': '-Pn -n -sS --stats-every 15s'},
+            {'tipo': 'tcp', 'desc': 'TCP SYN scan ALL ports', 'params': '-p- -Pn -n -sS --stats-every 15s'}]
+    menu1 = cli.Menu(title='Test 4', desc='Just a dummy test. [Implicit options: (-T3, -vvv)]', allowcustom=True)
+    menu1.add_entries(data)
     print(menu1.open(verbose=True))
 
 
@@ -95,10 +103,15 @@ def test_safe_list_input_1():
                               prompt='Dime 3 numeros del 1 al 10', min_val=1, max_val=10))
 
 
+def test_continue_or_exit():
+    print("hola?")
+    cli.continue_or_exit()
+    print("adios!")
+
 if __name__ == '__main__':
     # test_confirm()
     # test_prompt_form_simple()
     # test_prompt_form_advanced()
     # test_dict_to_table()
     # pyautogui.prompt(text="Apellido", title="field 1/3", default="mondongo")
-    print(test_menu_4())
+    print(test_menu_5())

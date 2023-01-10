@@ -1,12 +1,15 @@
 import sys
 import time
 import random
-import pyautogui
 import re
-import keyboard
-
 import signal
+
+# Problematic imports - start
+import keyboard
+import pyautogui
 import pyperclip
+# Problematic imports - end
+
 import klsframe.gui.guiLayout as guiLayout
 
 

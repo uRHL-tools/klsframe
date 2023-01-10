@@ -3,7 +3,7 @@ from typing import Union
 from klsframe.utilities.utils import validate, text_padding, dict_to_table
 
 
-def confirm_yes_no(selection, default=True, allow_empty=True, shortened=True):
+def confirm_yes_no(selection=None, default=True, allow_empty=True, shortened=True):
     a = 'yes'
     b = 'no'
     if shortened:
@@ -15,10 +15,13 @@ def confirm_yes_no(selection, default=True, allow_empty=True, shortened=True):
         hint = f'[{b.upper()}/{a}]'
     else:
         raise ValueError("Unexpected value for parameter 'default'")
+
+    if selection is None:
+        sel_str = ''
+    else:
+        sel_str = f"You selected:\n{text_padding(selection, decorator='*', decorate_lines='first')}\n"
     while True:
-        opt = input(
-            f"You selected:\n{text_padding(selection, decorator='*', decorate_lines='first')}\n"
-            f">> Do you want to continue? {hint}\t").strip().lower()
+        opt = input(f"{sel_str}>> Do you want to continue? {hint}\t").strip().lower()
         if opt == '':
             if allow_empty:
                 return default
@@ -30,6 +33,15 @@ def confirm_yes_no(selection, default=True, allow_empty=True, shortened=True):
             return True
         else:
             print(f"Option '{opt}' not recognized")
+
+
+def continue_or_exit():
+    # TODO: develop continue_or_exit(). A function that allows the program to continue or stops it
+    # Based on confirm_yes_no(), although the 'no' option implies exit()
+    if confirm_yes_no():
+        return None
+    else:
+        exit(0)
 
 
 def safe_string_input(validations=None, prompt=None, error_msg=None, confirm=False, allow_empty=True):
@@ -274,21 +286,22 @@ def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_cus
                 counter += 1
                 printable_prompt.insert(-1, f'{indent}{counter}. {placeholder(i)}')
                 aux.append(i)
-        # Disabled because each dict item should not be selectable and independent of the rest of its sibling items
-        # If you want to implement a ``selectable_dict`` create a ``Menu``
-        # elif isinstance(elem, dict):
-        #     for k, v in elem.items():
-        #         counter += 1
-        #         printable_prompt.insert(-1, f'{indent}{counter}. {placeholder(f"{k} ({v})")}')
-        #         aux.append({k: v})
-        else:
+        # each dict item should not be selectable and independent of the rest of its sibling items
+        elif isinstance(elem, dict):
+            val = text_padding(placeholder(f"\n{dict_to_table(elem)}"), padding=5)
+            printable_prompt.insert(-1, f'{indent}{counter}. {val}')
             counter += 1
+        elif isinstance(elem, MenuEntry) and isinstance(elem.value, dict):
+            val = text_padding(placeholder(f"\n{dict_to_table(elem.value)}"), padding=5)
+            printable_prompt.insert(-1, f'{indent}{counter}. {val}')
+            counter += 1
+        else:
             printable_prompt.insert(-1, f'{indent}{counter}. {placeholder(elem)}')
             aux.append(elem)
+            counter += 1
     # Add the custom option in the end. Maybe is better at the beginning?
     if enable_custom:
         counter += 1
-        printable_prompt.insert(-1, f'{indent}{counter}. Custom value')
         printable_prompt.insert(-1, f'{indent}{counter}. Custom value')
     while True:
         try:

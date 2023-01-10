@@ -45,3 +45,9 @@ Change Log
 -------------------
 - Fixed a bug in the component cli.Menu.__init__() that forced all MenuEntries.values to be strings instead of objects
 
+0.2.3 (09/01/2022)
+-------------------
+- Fixed a bug in the component `cli.Menu.open` that duplicated the custom option entry
+- Updated `cli.selectable_list`. Dictionaries are now printed like tables for better reading (see utils.dict_to_table())
+- New function `cli.continue_or_exit`. Allows the user to continue or stop the execution immediately
+- New module: `utilities.dataframe`. Auxiliary functions to work with pandas dataframes
