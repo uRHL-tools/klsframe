@@ -51,3 +51,7 @@ Change Log
 - Updated `cli.selectable_list`. Dictionaries are now printed like tables for better reading (see utils.dict_to_table())
 - New function `cli.continue_or_exit`. Allows the user to continue or stop the execution immediately
 - New module: `utilities.dataframe`. Auxiliary functions to work with pandas dataframes
+
+0.2.4 (11/01/2022)
+-------------------
+- Fixed a bug in the component `cli.selectable_list` that did not use options' indexes correctly

@@ -288,17 +288,17 @@ def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_cus
                 aux.append(i)
         # each dict item should not be selectable and independent of the rest of its sibling items
         elif isinstance(elem, dict):
+            counter += 1
             val = text_padding(placeholder(f"\n{dict_to_table(elem)}"), padding=5)
             printable_prompt.insert(-1, f'{indent}{counter}. {val}')
-            counter += 1
         elif isinstance(elem, MenuEntry) and isinstance(elem.value, dict):
+            counter += 1
             val = text_padding(placeholder(f"\n{dict_to_table(elem.value)}"), padding=5)
             printable_prompt.insert(-1, f'{indent}{counter}. {val}')
-            counter += 1
         else:
+            counter += 1
             printable_prompt.insert(-1, f'{indent}{counter}. {placeholder(elem)}')
             aux.append(elem)
-            counter += 1
     # Add the custom option in the end. Maybe is better at the beginning?
     if enable_custom:
         counter += 1
