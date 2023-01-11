@@ -291,10 +291,12 @@ def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_cus
             counter += 1
             val = text_padding(placeholder(f"\n{dict_to_table(elem)}"), padding=5)
             printable_prompt.insert(-1, f'{indent}{counter}. {val}')
+            aux.append(elem)
         elif isinstance(elem, MenuEntry) and isinstance(elem.value, dict):
             counter += 1
             val = text_padding(placeholder(f"\n{dict_to_table(elem.value)}"), padding=5)
             printable_prompt.insert(-1, f'{indent}{counter}. {val}')
+            aux.append(elem)
         else:
             counter += 1
             printable_prompt.insert(-1, f'{indent}{counter}. {placeholder(elem)}')

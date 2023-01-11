@@ -108,6 +108,7 @@ def test_continue_or_exit():
     cli.continue_or_exit()
     print("adios!")
 
+
 if __name__ == '__main__':
     # test_confirm()
     # test_prompt_form_simple()

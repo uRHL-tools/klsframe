@@ -55,3 +55,7 @@ Change Log
 0.2.4 (11/01/2022)
 -------------------
 - Fixed a bug in the component `cli.selectable_list` that did not use options' indexes correctly
+
+0.2.5 (11/01/2022)
+-------------------
+- Fixed a bug in the component `cli.selectable_list` that did not use options' indexes correctly
