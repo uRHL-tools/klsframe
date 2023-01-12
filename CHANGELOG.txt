@@ -43,7 +43,7 @@ Change Log
 
 0.2.2 (09/01/2022)
 -------------------
-- Fixed a bug in the component cli.Menu.__init__() that forced all MenuEntries.values to be strings instead of objects
+- Fixed a bug in the component cli.Menu.__init__() that forced all `MenuEntries.values` to be strings instead of objects
 
 0.2.3 (09/01/2022)
 -------------------
@@ -59,3 +59,8 @@ Change Log
 0.2.5 (11/01/2022)
 -------------------
 - Fixed a bug in the component `cli.selectable_list` that did not use options' indexes correctly
+
+0.2.6 (11/01/2022)
+-------------------
+- New component `utils.find_files`. Allows the user to search for files matching a regex within a folder
+- Updated 'utils.dict_to_table'. Now very large (overflowing) lines can be trimmed or wrapped

@@ -522,7 +522,7 @@ class Worker:
 # -----------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    keep_awake(minutes=45)
+    keep_awake(minutes=15)
     # w = Worker('millennial')
     # print(w.__dict__)
     # w.keep_awake(minutes=1)
