@@ -16,7 +16,7 @@ def validate(value, validations):
         return True
     else:
         for valid in validations:
-            if re.fullmatch(valid, value):
+            if re.fullmatch(valid, value) is not None:
                 return True
         return False
 
@@ -201,6 +201,85 @@ def find_files(rootdir=None, regex=None):
     return glob(os.path.join(rootdir, regex))
 
 
+def split_list(full_list: list, chunk_size: int, verbose=False):
+    """
+    Splits a list in chunks of `chunk_size` elements
+
+    :param full_list: list to be split
+    :param chunk_size: size of each chunk
+    :param verbose: Enable/disable verbose output
+    :return: a list of lists, containing all the chunks obtained from `full_list`
+    """
+    if not isinstance(chunk_size, int) or chunk_size < 1:
+        raise ValueError("Unexpected value for parameter 'chunk_size'. Only positive integer numbers allowed")
+    aux = []
+    offset = 0
+    step = 0
+    while offset < len(full_list):
+        aux.append(full_list[offset: offset + chunk_size])
+        step += 1
+        offset = chunk_size * step
+    if verbose:
+        for ind, chunk in enumerate(aux, 1):
+            print(f"[INFO] Chunk {ind} ({len(chunk)}): {chunk}")
+    return aux
+
+
+def assign_if_not_none(elem, if_none, if_not_none=None):
+    """
+    Checks if a value is None before returning it.
+
+    If `elem` is **None**, evaluates the parameter `if_none`.
+    In case of being a function, returns ``if_none(elem)``. Otherwise, returns ``if_none``
+
+
+    If `elem` is **not None**, by default returns `elem`. Nevertheless, if parameter `if_not_none` is provided,
+    the value returned is `if_not_none(elem)` or `if_not_none`, depending on if it is a function or not.
+
+    Examples
+
+    - severity = assign_if_not_none(elem=report_item.get('severity'), if_not_none=lambda x: severityDict.get(x))
+    - plugin_name = assign_if_not_none(elem=report_item.get('pluginName'))
+    - cpe = assign_if_not_none(elem=report_item.find("cpe"), if_not_none=lambda x: x.text, if_none='')
+
+    :param elem: Value to be tested
+    :param if_not_none: value, or function to evaluate, if ``elem`` is not None
+    :param if_none: Value, or function to evaluate, if ``elem`` is None
+    :return: (``elem`` | ``if_not_none`` | ``if_not_none(elem)``) if ``elem`` is not None.
+            Otherwise, (``if_none`` | ``if_none(elem)``)
+    """
+    if elem is not None:
+        if if_not_none is None:
+            return elem
+        else:
+            return if_not_none(elem) if is_function(if_not_none) else if_not_none
+    else:
+        return if_none(elem) if is_function(if_none) else if_none
+
+
+def is_function(obj):
+    return re.search('<function ', str(obj)) is not None
+
+
+def chunk_file_name(fname, step=1):
+    """
+    Example: recon_usuarios-2022-02-02-20_20.xml --> recon_usuarios-chunk3-2022-02-02-20_20.xml
+    """
+    _chunk_regex = '-chunk[0-9]+-'
+    if len(re.findall(_chunk_regex, fname)) > 0:
+        # The file name already contains a chunk. Just replace it
+        return str(re.sub(_chunk_regex, f'-chunk{step}-', fname))
+    else:
+        splitted = fname.split('\\')  # Split the path
+        name_split = splitted[-1].split('-')  # Split the file name
+        # Get the date element and append a prefix <_chunkN> being N the chunk number
+        name_split[-2] = f"chunk{step}-{name_split[-2]}"
+        # Update the file name in the full path value
+        splitted[-1] = "-".join(name_split)
+        return "\\".join(splitted)
+
+
 if __name__ == '__main__':
     # Do some quick tests here
+
     pass

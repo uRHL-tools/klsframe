@@ -64,3 +64,8 @@ Change Log
 -------------------
 - New component `utils.find_files`. Allows the user to search for files matching a regex within a folder
 - Updated 'utils.dict_to_table'. Now very large (overflowing) lines can be trimmed or wrapped
+
+0.2.7 (15/01/2022)
+-------------------
+- New functions `utils.assign_if_not_none`, `utils.split_list`, `utils.is_function` and `utils.chunk_filename`
+- New module: `utils.serializer`. Easy data serialization/deserialization. This version only implements JSON

@@ -70,5 +70,19 @@ def test_sort_dict():
     print(f"Alphabetical inverse value order:\n{utils.sort_dict(dicto, sortby='values', reverse=True)}")
 
 
+def test_assign_if_not_none():
+    import xml.etree.ElementTree as et
+    a = report_item.find("cpe").text if report_item.find("cpe") is not None else "",
+    eo = et.Element('cve', attrib={'port': '8080'})
+    eo.text = 'hola'
+    # port = assign_if_not_none(eo, test_value=lambda x: x.get('port'), if_none=lambda x: "")
+    val1 = utils.assign_if_not_none(test_value=eo.get('port'), if_none='')
+    val2 = utils.assign_if_not_none(test_value=eo.text, if_none='')
+    val3 = utils.assign_if_not_none(test_value=eo.get('host'), if_none='')
+    assert val1 == '8080' and val2 == 'hola' and val3 == ''
+    print(f"[INFO] Test `test_assign_if_not_none` successful")
+
+
 if __name__ == '__main__':
     test_dict_to_table_overflow()
+    test_assign_if_not_none()
