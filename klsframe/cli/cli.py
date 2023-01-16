@@ -1,6 +1,8 @@
 import re
 from typing import Union
-from klsframe.utilities.utils import validate, text_padding, dict_to_table
+import klsframe.utilities.utils as _kutils
+from klsframe.protypes.kdicts import dict_to_table
+from klsframe.protypes.kstrings import validate
 
 
 def confirm_yes_no(selection=None, default=True, allow_empty=True, shortened=True):
@@ -19,7 +21,7 @@ def confirm_yes_no(selection=None, default=True, allow_empty=True, shortened=Tru
     if selection is None:
         sel_str = ''
     else:
-        sel_str = f"You selected:\n{text_padding(selection, decorator='*', decorate_lines='first')}\n"
+        sel_str = f"You selected:\n{_kutils.text_padding(selection, decorator='*', decorate_lines='first')}\n"
     while True:
         opt = input(f"{sel_str}>> Do you want to continue? {hint}\t").strip().lower()
         if opt == '':
@@ -36,12 +38,16 @@ def confirm_yes_no(selection=None, default=True, allow_empty=True, shortened=Tru
 
 
 def continue_or_exit():
-    # TODO: develop continue_or_exit(). A function that allows the program to continue or stops it
-    # Based on confirm_yes_no(), although the 'no' option implies exit()
-    if confirm_yes_no():
-        return None
-    else:
-        exit(0)
+    """
+    Based on ``confirm_yes_no()``, although the 'no' option implies ``exit(0)``
+
+    :return: None
+    """
+    return None if confirm_yes_no() else exit(0)
+    # if confirm_yes_no():
+    #     return None
+    # else:
+    #     exit(0)
 
 
 def safe_string_input(validations=None, prompt=None, error_msg=None, confirm=False, allow_empty=True):
@@ -289,12 +295,12 @@ def selectable_list(args: list, placeholder=None, custom_prompt=None, enable_cus
         # each dict item should not be selectable and independent of the rest of its sibling items
         elif isinstance(elem, dict):
             counter += 1
-            val = text_padding(placeholder(f"\n{dict_to_table(elem)}"), padding=5)
+            val = _kutils.text_padding(placeholder(f"\n{dict_to_table(elem)}"), padding=5)
             printable_prompt.insert(-1, f'{indent}{counter}. {val}')
             aux.append(elem)
         elif isinstance(elem, MenuEntry) and isinstance(elem.value, dict):
             counter += 1
-            val = text_padding(placeholder(f"\n{dict_to_table(elem.value)}"), padding=5)
+            val = _kutils.text_padding(placeholder(f"\n{dict_to_table(elem.value)}"), padding=5)
             printable_prompt.insert(-1, f'{indent}{counter}. {val}')
             aux.append(elem)
         else:

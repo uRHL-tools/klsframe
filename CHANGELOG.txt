@@ -69,3 +69,17 @@ Change Log
 -------------------
 - New functions `utils.assign_if_not_none`, `utils.split_list`, `utils.is_function` and `utils.chunk_filename`
 - New module: `utils.serializer`. Easy data serialization/deserialization. This version only implements JSON
+
+0.3.0 (16/01/2022)
+-------------------
+- Refactor `utils.chunk_file_name`. Function divided into 2: `utils.insert_str` and `utils.append_to_filename`
+    - `utils.insert_str` allows to insert any string in another string
+    - `utils.append_to_filename` ( based on `insert_str`) allows to insert any string into a filename,
+        keeping file extension and file path
+- New functions
+    - `utils.cast_list`
+- Code reorganization
+    - New subpackage `klsframe.system`. Interface with the system and the cmd
+    - New subpackage `klsframe.protypes`. Wrappers and enhanced functions for builtins types and collections
+    - Most functions from `utils` have been distributed among `protypes` modules
+- Beta version of switch statement (module `system`)

@@ -3,8 +3,8 @@ import klsframe.cli.cli as cli
 
 def test_prompt_form_simple():
     form = cli.PromptForm(title='Test 1', desc='Just a test. Or not. I don\'t care')
-    form.add_field('nombre', nullable=False)
-    form.add_field('apellidos', nullable=False)
+    form.add_string_field('nombre', allow_empty=False)
+    form.add_string_field('apellidos', allow_empty=False)
     res = form.fill_in()
     print(res)
     assert res == form.last_result
@@ -115,4 +115,5 @@ if __name__ == '__main__':
     # test_prompt_form_advanced()
     # test_dict_to_table()
     # pyautogui.prompt(text="Apellido", title="field 1/3", default="mondongo")
-    print(test_menu_5())
+    # print(test_menu_5())
+    test_continue_or_exit()

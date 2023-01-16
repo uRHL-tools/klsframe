@@ -65,11 +65,11 @@ class APIworker:
     def scrap(self, url, depth=0):
         from bs4 import BeautifulSoup
 
-        w = APIworker.APIworker('GET')
+        w = APIworker('GET')
 
         all_links = []
-        MAX_DEPTH = 3
-        if depth >= MAX_DEPTH:
+        __max_depth__ = 3
+        if depth >= __max_depth__:
             raise AttributeError("[ERROR] Max depth exceeded")
         res = w.request(url)
         soup = BeautifulSoup(res.text, 'html.parser')
