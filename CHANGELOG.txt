@@ -83,3 +83,8 @@ Change Log
     - New subpackage `klsframe.protypes`. Wrappers and enhanced functions for builtins types and collections
     - Most functions from `utils` have been distributed among `protypes` modules
 - Beta version of switch statement (module `system`)
+
+0.3.1 (18/01/2022)
+-------------------
+- New class `dataframe.DataFrameCollection` will multiple functions. Check the docs for more information
+- New functions: `klist.list_wrap`, `dataframe.multi_merge`, `dataframe.group_and_count`

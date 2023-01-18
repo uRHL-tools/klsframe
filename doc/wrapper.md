@@ -2,6 +2,16 @@
 
 Do you need a wrapper for your script? Do not worry! you are in the right place
 
+Default arguments for your program: verbose output and version
+
+````python
+import argparse
+__version__ = '1.0.0'
+parser = argparse.ArgumentParser()
+parser.add_argument('-v', '--verbose', action='store_true', default=False)
+parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
+````
+
 ## Conf file
 
 ```yaml

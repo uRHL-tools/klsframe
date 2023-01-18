@@ -35,3 +35,14 @@ def cast_list(clist, to, _from=None):
         return [to(elem) for elem in clist]
     else:
         return [(to(elem) if isinstance(elem, _from) else elem) for elem in clist]
+
+
+def list_wrap(obj):
+    """
+    Checks if the given ``obj`` is a list before returning it.
+    If not, it will wrap the object and include it in a list
+
+    :param obj: Object or value to be tested
+    :return: a list including the provided ``obj``, or ``obj`` itself, if it already was a list
+    """
+    return obj if isinstance(obj, list) else [obj]
