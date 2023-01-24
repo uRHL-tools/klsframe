@@ -46,3 +46,26 @@ def list_wrap(obj):
     :return: a list including the provided ``obj``, or ``obj`` itself, if it already was a list
     """
     return obj if isinstance(obj, list) else [obj]
+
+
+def equivalent(l1: list, l2: list):
+    if not isinstance(l1, list) or not isinstance(l2, list):
+        raise TypeError("Invalid parameter types. Only list allowed")
+    elif len(l1) != len(l2):
+        return False
+    else:
+        for item in l1:
+            if item not in l2:
+                return False
+        return True
+
+
+if __name__ == '__main__':
+    assert equivalent([1, 2, 3], [1, 2, 3]) is True
+    assert equivalent([3, 1, 2], [1, 2, 3]) is True
+    assert equivalent(["aba", 2, 3], [2, "aba", 3]) is True
+    assert equivalent(["aba", 2, 3], [2, "aba", 2]) is False
+    assert equivalent(["aba", 2, 3], [2, "aba"]) is False
+    assert equivalent([{'nombre': 'manolo'}, 2, "aba"], [2, "aba", {'nombre': 'manolo'}]) is True
+    assert equivalent([{'nombre': 'manolo', 'apellidos': 'bombo'}, 2], [2, {'nombre': 'manolo'}]) is False
+

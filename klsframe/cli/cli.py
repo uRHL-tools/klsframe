@@ -412,9 +412,13 @@ class Menu:
         if verbose:
             print(f"{self.title} - {self.description}")
         ret = selectable_list(self.entries, enable_custom=self.allow_custom, custom_prompt=self.custom_prompt)
-        if isinstance(ret['value'], MenuEntry) and ret['value'].callback is not None:
-            ret['value'].callback()
-        return ret
+        if isinstance(ret['value'], MenuEntry):
+            if ret['value'].callback is not None:
+                ret['value'].callback()
+            sel = ret['value'].value
+        else:
+            sel = ret['value']
+        return sel
 
 
 # --------------------------------------------------------------------------

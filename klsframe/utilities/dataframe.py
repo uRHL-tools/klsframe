@@ -47,8 +47,9 @@ class DataFrameCollection(dict):
         else:
             self.update({dfname: dfdata if dfdata is not None else pd.DataFrame()})
 
-    def to_excel(self, outfile, exclude=None) -> None:
+    def to_excel(self, outfile, inlcude=None, exclude=None) -> None:
         """
+        TODO: implement include param like in function `combine`
         Saves the content of this DataFrameCollection instance into an Excel book
 
         :param outfile: Name for the output Excel book (file extension not needed, it is implicit)

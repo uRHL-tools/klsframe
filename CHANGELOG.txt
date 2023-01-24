@@ -88,3 +88,12 @@ Change Log
 -------------------
 - New class `dataframe.DataFrameCollection` will multiple functions. Check the docs for more information
 - New functions: `klist.list_wrap`, `dataframe.multi_merge`, `dataframe.group_and_count`
+
+0.3.2 (24/01/2022)
+-------------------
+- New functions: `klist.equivalent`
+- New methods: `GUIComponent.calibrate`
+- Code reorganization in `desktopWorker`. Code split into:
+    - `autobot`: static part (static click, press and move functions)
+    - `desktopWorker`: dynamic versions (execution scoped to a GUILayout, statistics gathering, playbook execution)
+- Bug fixed in `cli.Menu.open` that would return the MenuEntry itself instead of its value

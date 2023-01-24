@@ -18,8 +18,7 @@ if __name__ == '__main__':
     steps = [
         f'hatch version {__args__.version}',
         f"git add .", f'git commit -am "{__args__.version}"',
-        f'hatch build', f'hatch publish'
+        f'hatch clean', f'hatch build', f'hatch publish'
     ]
-    raise NotImplementedError("TODO. Configure git credentials")
     for st in steps:
         system.run_cmd(st)

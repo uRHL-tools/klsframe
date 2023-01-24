@@ -4,6 +4,11 @@ import os
 import re
 
 import pyautogui
+import klsframe.IplusD.loggers as _klogger
+import klsframe.protypes.klists
+import klsframe.cli.cli as cli
+import klsframe.workers.autobot as autobot
+
 # import klsframe.workers.desktopWorker as worker
 
 Point = collections.namedtuple("Point", "x y")
@@ -15,22 +20,6 @@ inner text;?;Y;Y;Y;N;Y
 """
 
 
-def calibrate():
-    # 1. Select: new gui layout OR edit existing one
-    # 2. Select: view current layout OR edit current layout
-    #              (tree view)            (list pages)
-    # 3. Add a page OR edit an existing page
-    # 4. Add / Edit / Remove component
-    pass
-
-
-def safe_coordinates(x, y):
-    if x is None or y is None:
-        return False
-    else:
-        return not (x <= 0 or pyautogui.size().width <= x or y <= 0 or pyautogui.size().height <= y)
-
-
 def screen_center():
     return pyautogui.size().width / 2, pyautogui.size().height / 2
 
@@ -40,8 +29,8 @@ class GUILayout:
     A GUI Layout is a list of pages.
     """
 
-    def __init__(self):
-        self.name = ''
+    def __init__(self, title=''):
+        self.title = title
         self.screen_size = pyautogui.size()
         self.pages = []
 
@@ -114,7 +103,7 @@ class GUILayout:
     def verify(self):
         for pg in self.pages:
             for comp, comp_coords in pg.components.items():
-                if not safe_coordinates(comp_coords[0], comp_coords[0]):
+                if not autobot.safe_coordinates(comp_coords[0], comp_coords[0]):
                     print(f"ERROR. Coordinate verification failed. Coordinates of component '{comp}' are not valid")
                     return 1
         return 0
@@ -133,6 +122,9 @@ class GUILayout:
 
     def screen_center(self):
         return self.screen_size.width / 2, self.screen_size.height / 2
+
+    def draw_tree(self):
+        print('TODO: draw_tree')
 
 
 class GUIPage:
@@ -168,18 +160,19 @@ class GUIComponent:
             self.comp_type = str(compclass.lower())
             self.title = title
             self.regex = regex
-            # self.start = None
-            # self.end = None
-            # self.screen_area = None
             self.screen_area = ScreenArea()
         else:
             raise TypeError(f"Invalid type ({type}) for GUIComponent")
 
     def calibrate(self):
-        self.screen_area = ScreenArea()
+        self.screen_area = ScreenArea.select_screen_area()
 
     def get_inner_text(self):
-        return self.title
+        if self.screen_area.is_initialized():
+            autobot.copy_text(self.get_point('center'))
+        else:
+            print(f"[WARN] Screen area not calibrated")
+            return ""
 
     def validate(self, value):
         if self.regex is None or re.fullmatch(self.regex, value) is not None:
@@ -194,9 +187,7 @@ class GUIComponent:
                               'top-left-side', 'top-right-side', 'bottom-right-side', 'bottom-left-side', 'center']
         if position not in _allowed_positions:
             raise ValueError(f"Unexpected value for parameter 'position'. Allowed: {', '.join(_allowed_positions)}")
-        return eval(f"self.screen_area.{opt.replace('-', '_')}")
-        # w = worker.Worker()
-        # w.click_at(eval(f"self.screen_area.{opt.replace('-', '_')}"), button=button, clicks=clicks)
+        return eval(f"self.screen_area.{position.replace('-', '_')}")
 
 
 class GUIButton(GUIComponent):
@@ -225,14 +216,15 @@ class GUIImageBox(GUIComponent):
 
 
 class GUITable(GUIComponent):
-    def __init__(self, title):
+    def __init__(self, title, columns: list):
         super().__init__(title=title, compclass='table')
-        self.first_row_Y = 0.0
-        self.row_height = 0.0
+        self.first_row_y = 0
+        self.row_height = 0
         self.table_size = 0  # Num of rows
+        self.rows_per_page = 0  # If no paging, rows_per_page = table_size
         self.next_page_button = GUIButton(title='nextPage')
         self.prev_page_button = GUIButton(title='prevPage')
-        self.columns = []
+        self.columns = [GUITableColumn(n) for n in klsframe.protypes.klists.list_wrap(columns)]
 
     def get_row_at(self, index):
         # TODO: Fix this shit. GuiLayour CANNOT use WORKER.
@@ -261,12 +253,36 @@ class GUITable(GUIComponent):
         pass
 
     def headers(self):
-        return [col.col_name for col in self.columns]
+        return [col.col_title for col in self.columns]
+
+    def calibrate(self):
+        print(f"[INFO] Measure column's width. Click all the columns' left|right border")
+        borders = [clk['position'] for clk in _klogger.record_mouse(clicks=len(self.columns) + 1)]
+        for ind, col in enumerate(self.columns):
+            col.left_border_x = borders[ind]
+            col.right_border_x = borders[ind + 1]
+        print(f"[INFO] Measure row height. Choose any row (row height must be constant!). "
+              f"Click the top border, then the bottom one")
+        user_clicks = _klogger.record_mouse(clicks=2)
+        # row_height = {'top': user_clicks[0]['position'], 'bottom': user_clicks[1]['position']}
+        self.row_height = int(user_clicks[1]['position'] - user_clicks[0]['position'])
+        print(f"[INFO] Record the position of the first row."
+              f"Click on the half height of the first row (the first row after the headers!)")
+        self.first_row_y = _klogger.record_mouse(clicks=1)
+        print(f"[INFO] Number of rows per table page")
+        self.rows_per_page = cli.safe_number_input(min_val=1)
+        print(f"[INFO] Configure pagination. Only necessary if the table is split in pages")
+        print(f"[INFO] Record the position of the Next page button. Click the top-left border, "
+              f"then the bottom-right. Or press enter if it does not exists")
+        self.next_page_button.calibrate()
+        print(f"[INFO] Record the position of the Prev page button. Click the top-left border, "
+              f"then the bottom-right. Press enter if it does not exists")
+        self.prev_page_button.calibrate()
 
 
 class GUITableColumn:
-    def __init__(self):
-        self.col_name = ''
+    def __init__(self, title):
+        self.col_title = title
         self.left_border_x = -1.0
         self.right_border_x = -1.0
         self.regex = None
@@ -282,6 +298,9 @@ class ScreenArea:
             self.set_coordinates('end', endp)
         elif (startp is None) ^ (endp is None):
             raise AttributeError("The parameter 'startp' and 'endp' must be used together")
+
+    def is_initialized(self):
+        return self.start is not None and self.end is not None
 
     def set_coordinates(self, position, point):
         # Check coordinates
@@ -316,7 +335,6 @@ class ScreenArea:
                 sa.set_coordinates('end', user_input[1]['position'])
                 return sa
             except (ValueError, TypeError) as e:
-                sa = None
                 print(e)
 
     # ----| C E N T E R |----
@@ -443,8 +461,37 @@ class ScreenArea:
         pass
 
 
+def menu_edit_layout():
+    menu = cli.Menu(
+        title="Edit a layout"
+    )
+    menu.add_entry()
+
+
 if __name__ == '__main__':
-    sa1 = ScreenArea.select_screen_area(verbose=True)
-    # sa1.draw_border(rounds=2, reverse=True, drawtime=0.5)
-    opt = 'top-left-corner'
-    print(eval(f"self.{opt.replace('-', '_')}"))
+    import argparse
+
+    __version__ = '1.0'
+    parser = argparse.ArgumentParser(
+        prog="gui-layout",
+        description="Create a new GUI layout or edit an existing one"
+    )
+    parser.add_argument('gui_layout_name', help="Name for the new GUI layout, or path to an existing one")
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
+
+    __args__ = parser.parse_args()
+    # 1. Select: new gui layout OR edit existing one
+    if os.path.exists(__args__.gui_layout_name):
+        guilayout = GUILayout.load(__args__.gui_layout_name)
+    else:
+        guilayout = GUILayout(__args__.gui_layout_name)
+    menu = cli.Menu(
+        title="Visualize or edit",
+        desc="View the current layout OR edit it"
+    )
+    menu.add_entry(value="Visualize (tree view)", callback=guilayout.draw_tree)
+    menu.add_entry(value="Edit", callback=menu_edit_layout)
+    menu.open()  # 2. Select: view current layout OR edit current layout
+    # 3. Add a page, edit an existing page,
+    # 4. Add / Edit / Remove component
+    pass
