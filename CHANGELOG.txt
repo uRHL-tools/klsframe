@@ -37,40 +37,40 @@ Change Log
 -------------------
 - Added utils.get_df_rows(). It retrieves a list of rows from a Pandas dataframe given their indexes
 
-0.2.1 (09/01/2022)
+0.2.1 (09/01/2023)
 -------------------
 - New fields in class cli.Menu: title and description. They provide some contextual info about the menu
 
-0.2.2 (09/01/2022)
+0.2.2 (09/01/2023)
 -------------------
 - Fixed a bug in the component cli.Menu.__init__() that forced all `MenuEntries.values` to be strings instead of objects
 
-0.2.3 (09/01/2022)
+0.2.3 (09/01/2023)
 -------------------
 - Fixed a bug in the component `cli.Menu.open` that duplicated the custom option entry
 - Updated `cli.selectable_list`. Dictionaries are now printed like tables for better reading (see utils.dict_to_table())
 - New function `cli.continue_or_exit`. Allows the user to continue or stop the execution immediately
 - New module: `utilities.dataframe`. Auxiliary functions to work with pandas dataframes
 
-0.2.4 (11/01/2022)
+0.2.4 (11/01/2023)
 -------------------
 - Fixed a bug in the component `cli.selectable_list` that did not use options' indexes correctly
 
-0.2.5 (11/01/2022)
+0.2.5 (11/01/2023)
 -------------------
 - Fixed a bug in the component `cli.selectable_list` that did not use options' indexes correctly
 
-0.2.6 (11/01/2022)
+0.2.6 (11/01/2023)
 -------------------
 - New component `utils.find_files`. Allows the user to search for files matching a regex within a folder
 - Updated 'utils.dict_to_table'. Now very large (overflowing) lines can be trimmed or wrapped
 
-0.2.7 (15/01/2022)
+0.2.7 (15/01/2023)
 -------------------
 - New functions `utils.assign_if_not_none`, `utils.split_list`, `utils.is_function` and `utils.chunk_filename`
 - New module: `utils.serializer`. Easy data serialization/deserialization. This version only implements JSON
 
-0.3.0 (16/01/2022)
+0.3.0 (16/01/2023)
 -------------------
 - Refactor `utils.chunk_file_name`. Function divided into 2: `utils.insert_str` and `utils.append_to_filename`
     - `utils.insert_str` allows to insert any string in another string
@@ -84,12 +84,12 @@ Change Log
     - Most functions from `utils` have been distributed among `protypes` modules
 - Beta version of switch statement (module `system`)
 
-0.3.1 (18/01/2022)
+0.3.1 (18/01/2023)
 -------------------
 - New class `dataframe.DataFrameCollection` will multiple functions. Check the docs for more information
 - New functions: `klist.list_wrap`, `dataframe.multi_merge`, `dataframe.group_and_count`
 
-0.3.2 (24/01/2022)
+0.3.2 (24/01/2023)
 -------------------
 - New functions: `klist.equivalent`
 - New methods: `GUIComponent.calibrate`
@@ -97,3 +97,8 @@ Change Log
     - `autobot`: static part (static click, press and move functions)
     - `desktopWorker`: dynamic versions (execution scoped to a GUILayout, statistics gathering, playbook execution)
 - Bug fixed in `cli.Menu.open` that would return the MenuEntry itself instead of its value
+
+0.3.3 (13/04/2023)
+-------------------
+- `workers.APIworker` refactored. New functions and Classes added.
+- New methods `klists.suffle` and `klists.merge`

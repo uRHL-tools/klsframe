@@ -27,6 +27,18 @@ def test_equivalent():
     except TypeError:
         print(f"[INFO] Exception catched\n[INFO] ``test_equivalent`` successful")
 
+
+def test_randomize():
+    a = [1, 2, 3, 4, 5]
+    b = [1, "jaosda", 3, [9, 9, 9], 5]
+    print(f"Normal: {a}")
+    print(f"Shuffle: {_klists.shuffle(a)}")
+    assert a == a
+    print(f"Normal: {b}")
+    print(f"Shuffle: {_klists.shuffle(b)}")
+    assert b == b
+
+
 if __name__ == '__main__':
     test_cast_list()
     test_equivalent()

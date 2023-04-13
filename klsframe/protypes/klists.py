@@ -1,3 +1,6 @@
+from typing import Optional
+
+
 def split_list(full_list: list, chunk_size: int, verbose=False):
     """
     Splits a list in chunks of `chunk_size` elements
@@ -60,12 +63,24 @@ def equivalent(l1: list, l2: list):
         return True
 
 
-if __name__ == '__main__':
-    assert equivalent([1, 2, 3], [1, 2, 3]) is True
-    assert equivalent([3, 1, 2], [1, 2, 3]) is True
-    assert equivalent(["aba", 2, 3], [2, "aba", 3]) is True
-    assert equivalent(["aba", 2, 3], [2, "aba", 2]) is False
-    assert equivalent(["aba", 2, 3], [2, "aba"]) is False
-    assert equivalent([{'nombre': 'manolo'}, 2, "aba"], [2, "aba", {'nombre': 'manolo'}]) is True
-    assert equivalent([{'nombre': 'manolo', 'apellidos': 'bombo'}, 2], [2, {'nombre': 'manolo'}]) is False
+def shuffle(lt):
+    import random
+    import copy
+    _aux = copy.deepcopy(lt)
+    random.shuffle(_aux)
+    return _aux
 
+
+def merge(*args, how=None) -> Optional[list]:
+    #TODO
+    if len(args) == 1:
+        print("[WARN] Not enough list to merge (less than one)")
+        return args[0]
+    else:
+        res = []
+        for i in range(0, len(args)):
+            res.extend([f"{a} {b}" for a, b in zip(res, args[i])])
+
+
+if __name__ == '__main__':
+    pass

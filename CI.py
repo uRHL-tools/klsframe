@@ -21,4 +21,4 @@ if __name__ == '__main__':
         f'hatch clean', f'hatch build', f'hatch publish'
     ]
     for st in steps:
-        system.run_cmd(st)
+        print(system.run_cmd(st))

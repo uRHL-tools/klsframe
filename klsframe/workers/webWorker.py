@@ -18,7 +18,7 @@ import webbrowser
 #     driver.quit()
 
 
-def open_browser(self):
+def open_browser(browser='firefox', home='http://www.google.com'):
     # TODO: check installation. Offer installation
     browsers = {
         "firefox": "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
@@ -26,12 +26,13 @@ def open_browser(self):
         "chrome": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         "chromium": "C:\\Program Files (x86)\\chromium-win\\chrome-win\\chrome.exe",
         "brave": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe",
-        "opera": "C:\\Users\\rhleon\\AppData\\Local\\Programs\\Opera\\launcher.exe"
+        "opera": "C:\\Users\\user\\AppData\\Local\\Programs\\Opera\\launcher.exe"
     }
     # To register
     for br_name, br_path in browsers.items():
         webbrowser.register(br_name, None, webbrowser.BackgroundBrowser(br_path))
 
     # To open
-    for browser in browsers:
-        webbrowser.get(browser).open('http://www.google.com')
+    # for browser in browsers:
+    #     webbrowser.get(browser).open('http://www.google.com')
+    webbrowser.get(browser).open(home)
